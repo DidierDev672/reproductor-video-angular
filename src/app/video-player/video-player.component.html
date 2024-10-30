@@ -1,0 +1,153 @@
+<div
+  class="video-player-container"
+  [class.controls-visible]="isControlsVisible"
+  [class.visible]="isControlsVisible"
+  (mouseenter)="onControlsInteraction()"
+  (mouseleave)="onControlsInteractionEnd()"
+>
+  <div class="video-wrapper">
+    <video
+      #videoPlayer
+      [src]="videoUrl"
+      (click)="togglePlay()"
+      [class.visible]="isControlsVisible"
+      preload="metadata"
+    ></video>
+
+    <canvas
+      #videoCanvas
+      (click)="togglePlay()"
+      [class.playing]="isPlaying"
+    ></canvas>
+
+    <div
+      class="video-overlay"
+      [class.visible]="isControlsVisible"
+      (mouseenter)="onControlsInteraction()"
+      (mouseleave)="onControlsInteractionEnd()"
+    >
+      <div
+        class="progress-container"
+        (mousemove)="onControlsInteraction()"
+        (mouseleave)="onControlsInteractionEnd()"
+      >
+        <div
+          class="progress-bar"
+          #progressBar
+          (mouseleave)="hideTimePreview()"
+          (click)="seek($event)"
+        >
+          <div class="progress-background"></div>
+          <div
+            class="progress-loaded"
+            [style.width]="loadedProgress + '%'"
+          ></div>
+          <div
+            class="progress-current"
+            [style.width]="currentProgress + '%'"
+          ></div>
+
+          <div
+            class="time-preview"
+            [class.visible]="isPreviewVisible"
+            [style.left]="previewPosition + '%'"
+          >
+            <div class="preview-time">
+              {{ transform(previewTime) }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="controls-container"
+        (mousemove)="onControlsInteraction()"
+        (mouseleave)="onControlsInteractionEnd()"
+      >
+        <div class="left-controls">
+          <button class="control-button" (click)="togglePlay()">
+            @if(!isPlaying){
+            <i class="fa-solid fa-play"></i>
+            }@else{
+            <i class="fa-solid fa-pause"></i>
+            }
+          </button>
+
+          <div class="volume-control">
+            <button class="control-button" (click)="toggleMute()">
+              <i
+                [class]="isMuted ? 'fa-solid fa-volume-low' : 'fa-solid fa-volume-high'"
+              ></i>
+            </button>
+          </div>
+
+          <div class="time-display">
+            {{ transform(currentTime) }} / {{ transform(duration) }}
+          </div>
+        </div>
+
+        <div class="right-controls">
+          <div class="quality-control">
+            <button class="quality-button" (click)="toggleQualityMenu()">
+              <i
+                class="settings-icon fa-solid fa-gear"
+                [class.rotating]="isChangingQuality"
+              ></i>
+              <span class="current-quality"
+                >{{ currentQuality?.label }} {{ isAutoQuality ? '(Auto)' : ''
+                }}</span
+              >
+            </button>
+            @if(isQualityMenuVisible){
+            <div class="quality-menu" [class.visible]="isQualityMenuVisible">
+              <div class="menu-title">Calidad</div>
+              <div class="quality-options">
+                <button
+                  class="quality-option"
+                  [class.active]="isAutoQuality"
+                  (click)="setAutoQuality()"
+                >
+                  <span class="quality-label">
+                    Automático @if(currentQuality){
+                    <span class="quality-tag">
+                      {{ currentQuality.label }}
+                    </span>
+                    }
+                  </span>
+                  @if(isAutoQuality){
+                  <i class="check-icon fa-solid fa-check"></i>
+                  }
+                </button>
+
+                @for(quality of qualities; track quality) {
+                <button
+                  class="quality-option"
+                  [class.active]="currentQuality?.label === quality.label && !isAutoQuality"
+                  (click)="changeQuality(quality)"
+                >
+                  <span class="quality-label">
+                    {{ quality.label }}
+                  </span>
+                  <span class="quality-tag" [class.hd]="quality.height >= 720">
+                    {{ quality.height >= 720 ? 'HD' : '' }}
+                  </span>
+                  @if(currentQuality?.label === quality.label){
+                  @if(currentQuality?.label === quality.label &&
+                  !isAutoQuality){
+                  <i class="fa-solid fa-check"></i>
+                  } }
+                </button>
+                }
+              </div>
+            </div>
+            }
+          </div>
+
+          <button class="control-button" (click)="toggleFullscreen()">
+            <i class="fa-solid fa-expand"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
