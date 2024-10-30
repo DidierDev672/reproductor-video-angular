@@ -1,0 +1,30 @@
+<div class="gallery-container">
+    @if(selectedVideo){
+        <div class="main-player">
+            <app-video-player [videoUrl]="selectedVideo.videoUrl" [videoId]="selectedVideo.id"></app-video-player>
+            <div class="video-info">
+                <h2>{{ selectedVideo.title }}</h2>
+                <p>{{ selectedVideo.description }}</p>
+            </div>
+        </div>
+    }
+
+    <div class="video-grid">
+        @for(video of videos; track $index){
+            <div
+            class="video-card"
+            [class.active]="selectedVideo?.id === video.id"
+            (click)="selectVideo(video)">
+            <div class="thumbnail">
+                <img [src]="video.thumbnail" [alt]="video.title" />
+                <span class="duration">{{ video.duration }}</span>
+            </div>
+
+            <div class="info">
+                <h3>{{ video.title }}</h3>
+                <p>{{ video.description }}</p>
+            </div>
+        </div>
+        }
+    </div>
+</div>
